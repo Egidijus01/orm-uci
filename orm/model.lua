@@ -1,11 +1,7 @@
-------------------------------------------------------------------------------
---                          Required classes                                --
-------------------------------------------------------------------------------
+local uci = require("uci")
+local Select = require('orm.get')
+local x = uci.cursor()
 
-
-------------------------------------------------------------------------------
---                               Table                                      --
-------------------------------------------------------------------------------
 All_Tables = {}
 local fields = require('orm.field_type')
 Table = {
@@ -43,11 +39,8 @@ function Table:create_table(table_instance)
     -- table information
     local tablename = table_instance.__tablename__
     local columns = table_instance.__colnames
-    -- print("before")
-    -- for i,x in pairs(columns[1]) do
+    print("before")
     
-    --     print(i,x)
-    -- end
     -- print("after")
 
     create_config_file(tablename)
@@ -66,7 +59,7 @@ end
 function Table.new(self, args)
     local colnames = {}
     local create_query
-
+    local id = 1
     self.__tablename__ = args.__tablename__
     args.__tablename__ = nil
 
@@ -80,7 +73,7 @@ function Table.new(self, args)
     
     --     print(i,x)
     -- end
-    print("customColumnCreateOrder", customColumnCreateOrder)
+ 
     -- Dont know what this is for
     if (customColumnCreateOrder) then
       for _, colname in ipairs(customColumnCreateOrder) do
@@ -142,9 +135,18 @@ function Table.new(self, args)
         -----------------------------------------
         create = function (self, data)
             -- return Query(self, data)
+            x:set(self.__tablename__, id, "interface")
+            print("id",id)
+            for name, value in pairs(data) do
+                x:set(self.__tablename__, id, name, value)
+            end
+            id = id + 1
+            local fileContent = x:get_all(self.__tablename__)
+            
 
-            for i,x in pairs(data) do
-                print(i,x)
+            local sect = fileContent["1"]
+            for key, value in pairs(sect) do
+                print(key,value)
             end
         end,
 
@@ -203,9 +205,10 @@ function Table.new(self, args)
     -- Add default column 'id'
 
     args.id = fields.PrimaryField({auto_increment = true})
+ 
     -- copy column arguments to new table instance
     for _, colname in ipairs(self.__columnCreateOrder__) do
-        print(colname)
+
         local coltype = args[colname];
         coltype.name = colname
         coltype.__table__ = Table_instance

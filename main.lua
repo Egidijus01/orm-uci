@@ -10,6 +10,17 @@ local user = User({
     password = "SuperSecretPassword",
 })
 
+
+local user1 = User({
+    username = "Bob Smith",
+    password = "SuperSecretPassword",
+})
+
+local k  = User.get:where({id=1}):all()
+
+-- for i,x in pairs(k) do
+--     print(i,x)
+-- end
 print("Ok")
 
 

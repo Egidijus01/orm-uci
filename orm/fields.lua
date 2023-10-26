@@ -76,6 +76,7 @@ local Field = {
 
                     -- Return string for column type create
                     _create_type = function (this)
+                       
                         local _type = this.field.__type__
 
                         if this.settings.max_length and this.settings.max_length > 0 then
