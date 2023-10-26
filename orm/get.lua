@@ -390,26 +390,46 @@ local Select = function(own_table)
         --------------------------------------------------------
 
         -- Return one value
-        
+        first = function (self)
+            local data = self:all()
+            -- for i,x in pairs(self.data) do
+            --     print(i,x)
+            -- end
+            -- self._rules.where.id
+            local sect = data[self._rules.where.id]
+            print(sect)
+            for key, value in pairs(sect) do
+                print(key,value)
+            end
+            -- local data = self:all()
+
+            -- if data:count() == 1 then
+            --     return data[1]
+            -- end
+        end,
 
         -- Return list of values
         all = function (self)
+            local res = {}
             local data = x:get_all(self.own_table.__tablename__)
-            print("here",self._rules.where)
-            for i,x in pairs(self._rules.where) do
-                print(i,x)
-            end
-            -- local data = self:_select()
-            -- return QueryList(self.own_table, data)
-            for section, options in pairs(data) do
-                print("[" .. section .. "]")
-                for option, value in pairs(options) do
-                    print(option , value)
-                end
-                print("---------------------------------")
-                print()
-            end
 
+            
+            for section, options in pairs(data) do
+                local t = {}
+
+                t["id"] = section 
+                for option, value in pairs(options) do
+                    
+                    if not option:match("^%.") then 
+                        print(option, value)
+                        t[option] = value
+                    end
+
+                end
+            table.insert(res, t)
+
+            end
+            return res
         end
     }
 end

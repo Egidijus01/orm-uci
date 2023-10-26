@@ -140,14 +140,25 @@ function Table.new(self, args)
             for name, value in pairs(data) do
                 x:set(self.__tablename__, id, name, value)
             end
+            x:commit(self.__tablename__)
+
             id = id + 1
-            local fileContent = x:get_all(self.__tablename__)
+            -- local data = x:get_all(self.__tablename__)
+
+            -- for section, options in pairs(data) do
+            --     print("[" .. section .. "]")
+            --     for option, value in pairs(options) do
+            --         print(option , value)
+            --     end
+            --     print("---------------------------------")
+            --     print()
+            -- end
             
 
-            local sect = fileContent["1"]
-            for key, value in pairs(sect) do
-                print(key,value)
-            end
+            -- local sect = fileContent["1"]
+            -- for key, value in pairs(sect) do
+            --     print(key,value)
+            -- end
         end,
 
         ------------------------------------------------

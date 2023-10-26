@@ -6,18 +6,21 @@ require("./models")
 
 
 local user = User({
-    username = "Bob Smith",
+    username = "Bob Smith1",
     password = "SuperSecretPassword",
 })
 
 
 local user1 = User({
-    username = "Bob Smith",
+    username = "Bob Smith2",
     password = "SuperSecretPassword",
 })
 
-local k  = User.get:where({id=1}):all()
-
+local a = User.get:all()
+print(a)
+for i,x in pairs(a[1]) do
+    print("pp",i,x)
+end
 -- for i,x in pairs(k) do
 --     print(i,x)
 -- end
