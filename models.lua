@@ -11,15 +11,16 @@ models.User = Table({
     password = fields.CharField({}),
 
 })
--- models.Job = Table.new({
---     __tablename__ = "job",
---     -- location = string,
---     -- type = string
+models.Job = Table({
+    __tablename__ = "job",
+    -- location = string,
+    -- type = string
     
---     username = fields.CharField(),
---     password = fields.CharField(),
+    location = fields.CharField({}),
+    type = fields.CharField({}),
 
--- })models.House = Table:create_table({
+})
+-- models.House = Table:create_table({
 --     __tablename__ = "house",
 --     -- color = string,
 --     -- size = string

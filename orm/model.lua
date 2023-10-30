@@ -1,18 +1,20 @@
 local uci = require("uci")
 local Select = require('orm.get')
+local Query = require('orm.query')
 local x = uci.cursor()
 
-All_Tables = {}
 local fields = require('orm.field_type')
-Table = {
-    -- database table name
-    __tablename__ = nil,
 
-}
-print("mod")
+
+All_Tables = {}
+
+
+
+
 Table = {
    
     __tablename__ = nil,
+    tables = {}
 
 }
 
@@ -35,11 +37,12 @@ end
 
 
 function Table:create_table(table_instance)
-    print("create")
+
     -- table information
     local tablename = table_instance.__tablename__
     local columns = table_instance.__colnames
-    print("before")
+   
+
     
     -- print("after")
 
@@ -53,43 +56,21 @@ end
 
 -- Create new table instance
 --------------------------------------
--- @args {table} must have __tablename__ key
--- and other must be a column names
---------------------------------------
+
 function Table.new(self, args)
+    self.tables = {}
     local colnames = {}
-    local create_query
-    local id = 1
     self.__tablename__ = args.__tablename__
     args.__tablename__ = nil
 
-    -- Determine the column creation order
-    -- This is necessary because tables in lua have no order
-    self.__columnCreateOrder__ = { "id" };
+    self.__cols__ = {};
 
-    local customColumnCreateOrder = args.__columnCreateOrder__;
-    args.__columnCreateOrder__ = nil;
-    -- for i,x in pairs(args) do
-    
-    --     print(i,x)
-    -- end
- 
-    -- Dont know what this is for
-    if (customColumnCreateOrder) then
-      for _, colname in ipairs(customColumnCreateOrder) do
 
-        -- Add only existing columns to the column create order
+    for colname, coltype in pairs(args) do
+
+        -- append to self cols
         if (args[colname]) then
-          table.insert(self.__columnCreateOrder__, colname);
-        end
-      end
-    end
-    -- ------------
-    for _, colname in ipairs(args) do
-
-        -- Add only existing columns to the column create order
-        if (args[colname]) then
-          table.insert(self.__columnCreateOrder__, colname);
+          table.insert(self.__cols__, colname);
         end
     end
     
@@ -107,17 +88,15 @@ function Table.new(self, args)
 
 
 
-        ------------------------------------------------
-        --                Metamethods                 --
-        ------------------------------------------------
 
-        -- If try get value by name "get" it return Select class instance
         __index = function (self, key)
+            
             if key == "get" then
                 return Select(self)
             end
 
             local old_index = self.__index
+           
             setmetatable(self, {__index = nil})
 
             key = self[key]
@@ -134,31 +113,9 @@ function Table.new(self, args)
         -- @retrun {table} Query instance
         -----------------------------------------
         create = function (self, data)
-            -- return Query(self, data)
-            x:set(self.__tablename__, id, "interface")
-            print("id",id)
-            for name, value in pairs(data) do
-                x:set(self.__tablename__, id, name, value)
-            end
-            x:commit(self.__tablename__)
+         
+            return Query(self, data)
 
-            id = id + 1
-            -- local data = x:get_all(self.__tablename__)
-
-            -- for section, options in pairs(data) do
-            --     print("[" .. section .. "]")
-            --     for option, value in pairs(options) do
-            --         print(option , value)
-            --     end
-            --     print("---------------------------------")
-            --     print()
-            -- end
-            
-
-            -- local sect = fileContent["1"]
-            -- for key, value in pairs(sect) do
-            --     print(key,value)
-            -- end
         end,
 
         ------------------------------------------------
@@ -194,7 +151,10 @@ function Table.new(self, args)
             BACKTRACE(WARNING, "Can't find column '" .. tostring(colname) ..
                                "' in table '" .. self.__tablename__ .. "'")
         end,
-
+        
+        get_tables = function ()
+            return self.tables
+        end,
         -- get column instance by name
         -----------------------------------------
         -- @colname {string} column name
@@ -218,27 +178,30 @@ function Table.new(self, args)
     args.id = fields.PrimaryField({auto_increment = true})
  
     -- copy column arguments to new table instance
-    for _, colname in ipairs(self.__columnCreateOrder__) do
-
+    for _, colname in ipairs(self.__cols__) do
+        
         local coltype = args[colname];
         coltype.name = colname
         coltype.__table__ = Table_instance
-
+ 
         table.insert(Table_instance.__colnames, coltype)
     end
 
 
-
+    table.insert(self.tables, Table_instance)
     setmetatable(Table_instance, {
         __call = Table_instance.create,
         __index = Table_instance.__index
     })
-
-
-
-
-
     _G.All_Tables[self.__tablename__] = Table_instance
+
+
+
+    for i,x in pairs(Table_instance) do
+    
+        print(i,x)
+    end
+
 
     -- Create new table if needed
     self:create_table(Table_instance)

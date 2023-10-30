@@ -1,30 +1,80 @@
 package.path = package.path .. ";/home/studentas/Public/learn/uci/?.lua"
 local models = require("./models")
 local User = models.User
+local Job = models.Job
 require("./models")
 
 
-
-local user = User({
-    username = "Bob Smith1",
-    password = "SuperSecretPassword",
+local job1 = Job({
+    location="Something",
+    type="123"
 })
+local job2 = Job({
+    location="Something",
+    type="123444"
+})
+job1:save()
+
+job1.type="new val15"
+job1:save()
+
+-- print("job",job1.type)
+
+job2:save()
+
+job2:delete()
+
+-- for i,x in pairs(job2) do
+
+--     print(i,x)
+-- end
+-- print("----------------------------------------------")
 
 
 local user1 = User({
     username = "Bob Smith2",
     password = "SuperSecretPassword",
 })
+-- for i,x in pairs(user1) do
 
-local a = User.get:all()
-print(a)
-for i,x in pairs(a[1]) do
-    print("pp",i,x)
-end
+--     print(i,x)
+-- end
+-- print("---------------------")
+local a = User.get:where({id=1}):first()
+
+-- for i,x in pairs(a) do
+
+--     print(i,x)
+-- end
+-- local a = User.get:all()
+-- print("-----------------------------")
+user1.username = "John Smith"
+user1:save()
+
+
+-- print(user1.username)
+
+
+
+-- for i,x in pairs(a[1]) do
+--     print(i,x)
+-- end
+
+
+-- a.username="John"
+
+-- a:save()
+
+-- print(a)
+-- for i,x in pairs(a) do
+--     print(i,x)
+-- end
+-- User.get:where({id = "2"}):delete()
+
 -- for i,x in pairs(k) do
 --     print(i,x)
 -- end
-print("Ok")
+-- print("Ok")
 
 
 
