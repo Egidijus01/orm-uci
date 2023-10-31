@@ -3,58 +3,23 @@ local uci = require("uci")
 local x = uci.cursor()
 
 local function return_match(data, rules)
-
-    -- for index, table in ipairs(data) do
-    --     local match = false
-    --     --  id    2
-    --     for key, value in pairs(rules) do
-    --         -- local a = x:get(tablename, "interface", 1)
-    --         -- print("a",a)
-    --         -- print(table[key])
-    --         -- print(value)
-    --         -- local id = table[".index"]
-    --         -- print("id",id)
-
-    --         x:foreach("user", "interface", function(s)
-    --                  print('------------------')
-    --                  if s['.name'] == 'cfg026d96' then
-                        
-    --                     for key, value in pairs(s) do
-    --                         print(key .. ': ' .. tostring(value))
-    --                     end
-    --                  end
-    --             end)
-    --         -- for i,x in pairs(table) do
-            
-    --         --     print(i,x)
-    --         -- end
-    --         if table.id == value then
-    --             match = true
-    --             break
-    --         end
-    --     end
-    --     if match then
-    --         return table
-    --     end
-    -- end
-
-    for key, value in pairs(rules) do
-        
-        if data[value] then
-            return data[value]
-            
+    for _, table in ipairs(data) do
+        local match = true
+        for key, value in pairs(rules) do
+            if table[key] ~= value then
+                match = false
+                break  -- Break the inner loop when a non-match is found
+            end
+        end
+        if match then
+            return table  -- Return the table after checking all key-value pairs
         end
     end
-
-    return data[2]
 end
 
 local Select = function(own_table)
     return {
-        ------------------------------------------------
-        --          Table info varibles               --
-        ------------------------------------------------
-        -- Link for table instance
+
         own_table = own_table,
 
         -- Create select rules
@@ -79,67 +44,28 @@ local Select = function(own_table)
             return self
         end,
 
+---------------------------------------------------------------------
 
-        
-        
-        --------------------------------------------------------
-        --                 Update data methods                --
-        --------------------------------------------------------
-
-        update = function (self, data)
-            if Type.is.table(data) then
-                
-
-                
-
-                -- Build WHERE
-                -- if next(self._rules.where) then
-                --     _where = self:_condition(self._rules.where, "\nWHERE")
-                -- else
-
-                -- end
-
-               
-            else
-                BACKTRACE(WARNING, "No data for global update")
-            end
-        end,
-
-        --------------------------------------------------------
-        --                 Delete data methods                --
-        --------------------------------------------------------
-
-
-        delete = function (self)
-            
+        -- GET METHODS
+        with_id = function (self, id)
             local data = self:all()
-            -- Build WHERE
-            if next(self._rules.where) then
-                local tab = return_match(data, self._rules.where)
-                if tab then
-                    x:delete(self.own_table.__tablename__, tab.id)
 
-                    x.commit(self.own_table.__tablename__)
+            -- for key, value in pairs(rules) do
+        
+                if data[id] then
+                    return data[id]
+                    
                 end
-            else
-                return "error"
-            end
-            
+            -- end
         end,
-
-
--------------------------------------------------------------------------
-
-        -- GET
 
         first = function (self)
             
             local data = self:all()
-            -- for i,x in pairs(self) do
+            -- for i,x in pairs(data) do
             --     print(i,x)
             -- end
             
-
             local table = return_match(data, self._rules.where)
             
             if table then
@@ -150,37 +76,15 @@ local Select = function(own_table)
 
         -- Return list of values
         all = function (self)
-            -- local res = {}
-            -- local data = x:get_all(self.own_table.__tablename__)
 
-            
-            -- for section, options in pairs(data) do
-            --     local t = {}
+            local data = _G.All_Tables
 
-            --     for option, value in pairs(options) do
-                    
-            --         if not option:match("^%.") then 
-                       
-            --             t[option] = value
-            --         end
+            local tablename = self.own_table.__tablename__
 
-            --     end
-            -- table.insert(res, t)
-
-            -- end
-            -- return res
-            -- local data = self.data
-            -- print(All_Tables)
-            -- return QueryList(self.own_table)
-            local data = self.own_table.get_tables()
-                
-            -- for i,x in pairs(data) do
-            -- print(i,x)
-            -- end
-            return data
+            return data[tablename]
         end,
 
     }
 end
 
-return Select 
+return Select

@@ -15,14 +15,13 @@ local job2 = Job({
 })
 job1:save()
 
-job1.type="new val15"
-job1:save()
+
 
 -- print("job",job1.type)
 
 job2:save()
 
-job2:delete()
+-- job2:delete()
 
 -- for i,x in pairs(job2) do
 
@@ -35,30 +34,31 @@ local user1 = User({
     username = "Bob Smith2",
     password = "SuperSecretPassword",
 })
+-- print("usrename", user1.username)
 -- for i,x in pairs(user1) do
 
 --     print(i,x)
 -- end
 -- print("---------------------")
-local a = User.get:where({id=1}):first()
+-- local a = User.get:where({id=1}):first()
+-- local a = User.get:with_id(1)
 
+-- print("username",a.username)
 -- for i,x in pairs(a) do
 
 --     print(i,x)
 -- end
 -- local a = User.get:all()
 -- print("-----------------------------")
-user1.username = "John Smith"
+
 user1:save()
 
+local a = User.get:where({username="Bob Smith2"}):first()
+print(a.username)
 
--- print(user1.username)
 
 
 
--- for i,x in pairs(a[1]) do
---     print(i,x)
--- end
 
 
 -- a.username="John"

@@ -4,26 +4,7 @@
 
 local uci = require("uci")
 local x = uci.cursor()
--- Creates an instance to retrieve and manage a
--- string table with the database
----------------------------------------------------
--- @own_table {table} parent table instace
--- @data {table} data returned by the query to the database
---
--- @return {table} database query instance
----------------------------------------------------
 
-local function get_id(table) 
-    print("?????????????????????????????????????????")
-    for _, table_column in pairs(table[1]) do
-        -- for i,x in pairs(table_column) do
-        --     print(i,x)
-        -- end
-        print(table_column)
-    end
-    print("?????????????????????????????????????????")
-    
-end
 
 function Query(own_table, data)
     local query = {
@@ -36,7 +17,36 @@ function Query(own_table, data)
 
 
         _data = {},
+        _get_col = function (self, colname)
+            
+            if self._data[colname] and self._data[colname].new then
+                return self._data[colname].new
 
+            elseif self._readonly[colname] then
+                return self._readonly[colname]
+            end
+        end,
+
+        -- Set column new value
+        -----------------------------------------
+        -- @colname {string} column name in table
+        -- @colvalue {string|number|boolean} new column value
+        -----------------------------------------
+        _set_col = function (self, colname, colvalue)
+            
+            local coltype
+
+            if self._data[colname] and self._data[colname].new and colname ~= ID then
+                coltype = self.own_table:get_column(colname)
+
+                if coltype and coltype.field.validator(colvalue) then
+                    self._data[colname].old = self._data[colname].new
+                    self._data[colname].new = colvalue
+                else
+                    BACKTRACE(WARNING, "Not valid column value for update")
+                end
+            end
+        end,
 
 
         _add = function (self)
@@ -104,8 +114,6 @@ function Query(own_table, data)
 
         -- delete row
         delete = function (self)
-            
-            
             x:delete(self.own_table.__tablename__, self._data.id.new)
             x:commit(self.own_table.__tablename__)
             
@@ -123,23 +131,21 @@ function Query(own_table, data)
                     new = colvalue,
                     old = colvalue
                 }
-            else
-                if _G.All_Tables[colname] then
-                    current_table = _G.All_Tables[colname]
-                    colvalue = Query(current_table, colvalue)
-
-                    query._readonly[colname .. "_all"] = QueryList(current_table, {})
-                    query._readonly[colname .. "_all"]:add(colvalue)
-
-                end
-
-                query._readonly[colname] = colvalue
             
             end
         end
     
     end
+    setmetatable(query, {__index = query._get_col,
+                         __newindex = query._set_col})
 
+    local tablename = query.own_table.__tablename__
+
+    if not _G.All_Tables[tablename] then
+        _G.All_Tables[tablename] = {}
+    end
+    
+    table.insert(_G.All_Tables[tablename], query)
 
 
     return query

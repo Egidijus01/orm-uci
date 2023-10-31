@@ -40,13 +40,12 @@ field.IntegerField = Field:register({
 })
 
 field.CharField = Field:register({
-    __type__ = "varchar",
     validator = Type.is.str,
     as = save_as_str
 })
 
 field.TextField = Field:register({
-    __type__ = "text",
+
     validator = Type.is.str,
     as = save_as_str
 })

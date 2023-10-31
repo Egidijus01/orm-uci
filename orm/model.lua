@@ -193,14 +193,14 @@ function Table.new(self, args)
         __call = Table_instance.create,
         __index = Table_instance.__index
     })
-    _G.All_Tables[self.__tablename__] = Table_instance
+    -- _G.All_Tables[self.__tablename__] = Table_instance
 
 
 
-    for i,x in pairs(Table_instance) do
+    -- for i,x in pairs(Table_instance) do
     
-        print(i,x)
-    end
+    --     print(i,x)
+    -- end
 
 
     -- Create new table if needed

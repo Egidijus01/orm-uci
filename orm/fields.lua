@@ -70,35 +70,10 @@ local Field = {
                         null = false,
                         unique = false,
                         max_length = nil,
-                        primary_key = false,
                         escape_value = false
                     },
 
-                    -- Return string for column type create
-                    _create_type = function (this)
-                       
-                        local _type = this.field.__type__
-
-                        if this.settings.max_length and this.settings.max_length > 0 then
-                            _type = _type .. "(" .. this.settings.max_length .. ")"
-                        end
-
-                        if this.settings.primary_key then
-                            _type = _type .. " PRIMARY KEY"
-                        end
-
-                        if this.settings.auto_increment then
-                            _type = _type .. " AUTO_INCREMENT"
-                        end
-
-                        if this.settings.unique then
-                            _type = _type .. " UNIQUE"
-                        end
-
-                        _type = _type .. (this.settings.null and " NULL"
-                                                             or " NOT NULL")
-                        return _type
-                    end
+                    
                 }
 
                 -- Set Default settings
